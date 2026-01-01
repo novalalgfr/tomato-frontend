@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 export default function Navbar() {
 	return (
-		<nav className="w-full flex flex-col sm:flex-row justify-between items-center py-6 border-b-2 border-dashed border-border/30 gap-4">
+		<nav className="w-full flex flex-col sm:flex-row justify-between items-center pb-6 border-b-2 border-dashed border-border/30 gap-4">
 			<div className="flex items-center gap-3 group cursor-default">
 				<div className="relative">
 					<div className="absolute inset-0 bg-leaf/20 rounded-full blur-sm transform group-hover:scale-125 transition-transform" />
