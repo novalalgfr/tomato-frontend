@@ -292,7 +292,7 @@ export default function InputArea() {
 								</div>
 							)}
 
-							<div className="flex gap-4">
+							<div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
 								<button
 									onClick={handleReset}
 									className="px-6 py-3 font-mono text-sm font-bold border-2 border-border text-secondary hover:text-primary hover:bg-white/5 transition-colors uppercase rounded-sm cursor-pointer"
@@ -304,7 +304,7 @@ export default function InputArea() {
 									<button
 										onClick={handleGenerate}
 										disabled={isProcessing}
-										className="px-8 py-3 bg-accent text-white font-mono text-sm font-bold border-2 border-accent hover:bg-red-600 transition-colors uppercase flex items-center gap-2 shadow-[4px_4px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50 disabled:cursor-not-allowed rounded-sm cursor-pointer"
+										className="px-8 py-3 bg-accent text-white text-center font-mono text-sm font-bold border-2 border-accent hover:bg-red-600 transition-colors uppercase flex items-center justify-center gap-2 shadow-[4px_4px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50 disabled:cursor-not-allowed rounded-sm cursor-pointer"
 									>
 										{isProcessing ? (
 											<RefreshCw
