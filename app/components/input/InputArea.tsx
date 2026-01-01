@@ -171,7 +171,7 @@ export default function InputArea() {
 			</div>
 
 			<div className="bg-surface border-2 border-border p-6 sm:p-8 paper-shadow min-h-[450px] relative z-0">
-				<div className="absolute -top-5 -right-1 sm:right-4 bg-[#27272a] border-2 border-[#525252] px-4 py-1 shadow-lg z-20 flex items-center gap-3 rounded-sm">
+				<div className="md:visible invisible absolute -top-5 -right-1 sm:right-4 bg-[#27272a] border-2 border-[#525252] px-4 py-1 shadow-lg z-20 flex items-center gap-3 rounded-sm">
 					<div className="w-1.5 h-1.5 rounded-full bg-[#737373] shadow-inner" />
 
 					<span className="font-mono text-[10px] font-bold text-gray-400 tracking-[0.2em] uppercase">
@@ -221,7 +221,7 @@ export default function InputArea() {
 				) : (
 					<div className="flex flex-col items-center animate-in fade-in zoom-in-95 duration-500">
 						<div className="bg-white p-3 pb-12 shadow-xl transform rotate-1 transition-transform hover:rotate-0 duration-500 max-w-full relative inline-block">
-							<div>
+							<div className="md:visible invisible">
 								<div className="absolute -top-7 left-1/2 -translate-x-1/2 w-10 h-8 border-x-4 border-t-4 border-gray-400 rounded-t-md z-10" />
 
 								<div className="absolute -top-2 left-1/2 -translate-x-1/2 w-16 h-6 bg-[#1a1a1a] rounded-sm shadow-lg z-20 flex items-center justify-center border-t border-gray-600">
@@ -229,7 +229,7 @@ export default function InputArea() {
 								</div>
 							</div>
 
-							<div className="relative min-w-[300px] max-w-[600px] bg-gray-100 border border-gray-300 overflow-hidden">
+							<div className="relative w-full sm:min-w-[300px] max-w-[600px] bg-gray-100 border border-gray-300 overflow-hidden">
 								<Image
 									src={image}
 									alt="Original Specimen"
