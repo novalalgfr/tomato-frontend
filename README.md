@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tomato.Logy - AI Diagnostic Interface
 
-## Getting Started
+Web interface (Frontend) untuk sistem **Deteksi Penyakit Daun Tomat** berbasis Artificial Intelligence. Aplikasi ini dirancang dengan tema **"Dark Industrial Lab"**, mensimulasikan meja kerja laboratorium digital untuk menganalisis spesimen tanaman menggunakan model **YOLOv11**.
 
-First, run the development server:
+## 🧠 Tech Stack
+
+-   **Framework:** Next.js 16 (App Router)
+-   **Styling:** Tailwind CSS
+-   **Animation:** Framer Motion
+-   **Icons:** Lucide React
+-   **Library Pendukung:** react-dropzone, react-webcam, clsx, tailwind-merge
+
+## 📂 Struktur Folder
+
+```text
+frontend/
+├── app/                  # App Router (Pages, Layout, Globals CSS)
+├── components/           # Komponen Modular
+│   ├── home/             # Hero Section
+│   ├── input/            # InputArea (Logika Upload & Kamera)
+│   └── layout/           # Navbar & Footer
+├── public/               # Aset statis
+```
+
+## 🚀 Cara Menjalankan (Local)
+
+Pastikan Node.js sudah terinstal di komputer Anda (versi 18+ direkomendasikan).
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/novalalgfr/saliency-frontend.git
+cd frontend
+```
+
+### 2. Install Dependencies
+
+```bash
+pnpm install
+```
+
+### 3. Jalankan Server Development
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Aplikasi akan berjalan di `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## ✨ Fitur Utama
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+-   **Dual Input Mode:** Upload file (Drag & Drop) dan pengambilan gambar via Webcam
+-   **Smart Validation:** Validasi format gambar (JPG/PNG) dan ukuran file (Max 5MB)
+-   **Interactive UI:** Transisi halus dengan Framer Motion
+-   **Visual Feedback:** Notifikasi toast untuk penanganan error
+-   **Responsive Preview:** Tampilan pratinjau yang menyesuaikan rasio asli citra
 
-## Learn More
+## 📝 Lisensi
 
-To learn more about Next.js, take a look at the following resources:
+Project ini dikembangkan untuk keperluan edukasi dan penelitian.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**© 2026 Tomato.Logy Lab**
