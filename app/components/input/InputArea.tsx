@@ -38,6 +38,10 @@ export default function InputArea() {
 
 	const webcamRef = useRef<Webcam>(null);
 
+	const videoConstraints = {
+		facingMode: 'environment'
+	};
+
 	const showNotification = (message: string) => {
 		setNotification(message);
 		setTimeout(() => setNotification(null), 4000);
@@ -208,6 +212,7 @@ export default function InputArea() {
 							<Webcam
 								audio={false}
 								ref={webcamRef}
+								videoConstraints={videoConstraints}
 								screenshotFormat="image/jpeg"
 								className="w-full h-full object-cover opacity-90"
 							/>
