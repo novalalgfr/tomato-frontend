@@ -8,8 +8,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import clsx from 'clsx';
 import Image from 'next/image';
 
-type InputMode = 'file' | 'camera';
-type ViewMode = 'original' | 'detected';
+import DetectionResults from './DetectionResults';
+
+export type InputMode = 'file' | 'camera';
+export type ViewMode = 'original' | 'detected';
+
+export interface DetectionDetail {
+	class_name: string;
+	confidence: number;
+}
 
 const dataURLtoFile = (dataurl: string, filename: string) => {
 	const arr = dataurl.split(',');
@@ -30,6 +37,7 @@ export default function InputArea() {
 	const [fileToUpload, setFileToUpload] = useState<File | null>(null);
 
 	const [detectedImage, setDetectedImage] = useState<string | null>(null);
+	const [detectionDetails, setDetectionDetails] = useState<DetectionDetail[]>([]);
 
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [result, setResult] = useState<boolean>(false);
@@ -56,6 +64,7 @@ export default function InputArea() {
 			setResult(false);
 			setActiveView('original');
 			setDetectedImage(null);
+			setDetectionDetails([]);
 		}
 	}, []);
 
@@ -88,6 +97,7 @@ export default function InputArea() {
 			setNotification(null);
 			setResult(false);
 			setDetectedImage(null);
+			setDetectionDetails([]);
 			setActiveView('original');
 		}
 	}, [webcamRef]);
@@ -100,6 +110,7 @@ export default function InputArea() {
 		setIsProcessing(true);
 		setActiveView('original');
 		setResult(false);
+		setDetectionDetails([]);
 
 		const formData = new FormData();
 		formData.append('file', fileToUpload);
@@ -117,6 +128,12 @@ export default function InputArea() {
 				setDetectedImage(data.detect_url);
 				setResult(true);
 				setActiveView('detected');
+
+				const details = data.details || [];
+				setDetectionDetails(details);
+
+				console.log('=== HASIL DIAGNOSIS TOMATO.LOGY ===');
+				console.log(details);
 			} else {
 				showNotification(data.error || 'Failed to process image.');
 			}
@@ -133,200 +150,209 @@ export default function InputArea() {
 		setFileToUpload(null);
 		setResult(false);
 		setDetectedImage(null);
+		setDetectionDetails([]);
 		setActiveView('original');
 		setNotification(null);
 	};
 
 	return (
-		<div className="relative w-full max-w-3xl mx-auto">
-			<div className="flex pl-4 gap-2">
-				<button
-					onClick={() => {
-						setMode('file');
-						handleReset();
-					}}
-					className={clsx(
-						'px-6 py-3 text-sm font-bold font-mono uppercase tracking-wider border-2 border-b-0 border-border rounded-t-lg transition-all cursor-pointer',
-						mode === 'file'
-							? 'bg-surface text-accent border-b-surface -mb-[2px] z-10'
-							: 'bg-white/5 text-secondary hover:bg-white/10 hover:text-primary'
-					)}
-				>
-					<div className="flex items-center gap-2">
-						<Upload size={16} /> File_Upload
-					</div>
-				</button>
-				<button
-					onClick={() => {
-						setMode('camera');
-						handleReset();
-					}}
-					className={clsx(
-						'px-6 py-3 text-sm font-bold font-mono uppercase tracking-wider border-2 border-b-0 border-border rounded-t-lg transition-all cursor-pointer',
-						mode === 'camera'
-							? 'bg-surface text-accent border-b-surface -mb-[2px] z-10'
-							: 'bg-white/5 text-secondary hover:bg-white/10 hover:text-primary'
-					)}
-				>
-					<div className="flex items-center gap-2">
-						<Camera size={16} /> Live_Cam
-					</div>
-				</button>
-			</div>
-
-			<div className="bg-surface border-2 border-border p-6 sm:p-8 paper-shadow min-h-[450px] relative z-0">
-				<div className="md:visible invisible absolute -top-5 -right-1 sm:right-4 bg-[#27272a] border-2 border-[#525252] px-4 py-1 shadow-lg z-20 flex items-center gap-3 rounded-sm">
-					<div className="w-1.5 h-1.5 rounded-full bg-[#737373] shadow-inner" />
-
-					<span className="font-mono text-[10px] font-bold text-gray-400 tracking-[0.2em] uppercase">
-						INPUT_ZONE
-					</span>
-
-					<div className="w-1.5 h-1.5 rounded-full bg-[#737373] shadow-inner" />
+		<div className="relative w-full max-w-3xl mx-auto flex flex-col gap-6">
+			<div>
+				<div className="flex pl-4 gap-2">
+					<button
+						onClick={() => {
+							setMode('file');
+							handleReset();
+						}}
+						className={clsx(
+							'px-6 py-3 text-sm font-bold font-mono uppercase tracking-wider border-2 border-b-0 border-border rounded-t-lg transition-all cursor-pointer',
+							mode === 'file'
+								? 'bg-surface text-accent border-b-surface -mb-[2px] z-10'
+								: 'bg-white/5 text-secondary hover:bg-white/10 hover:text-primary'
+						)}
+					>
+						<div className="flex items-center gap-2">
+							<Upload size={16} /> File_Upload
+						</div>
+					</button>
+					<button
+						onClick={() => {
+							setMode('camera');
+							handleReset();
+						}}
+						className={clsx(
+							'px-6 py-3 text-sm font-bold font-mono uppercase tracking-wider border-2 border-b-0 border-border rounded-t-lg transition-all cursor-pointer',
+							mode === 'camera'
+								? 'bg-surface text-accent border-b-surface -mb-[2px] z-10'
+								: 'bg-white/5 text-secondary hover:bg-white/10 hover:text-primary'
+						)}
+					>
+						<div className="flex items-center gap-2">
+							<Camera size={16} /> Live_Cam
+						</div>
+					</button>
 				</div>
 
-				{!image ? (
-					mode === 'file' ? (
-						<div
-							{...getRootProps()}
-							className={clsx(
-								'w-full h-[350px] border-4 border-dashed border-border/40 rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all bg-white/5',
-								isDragActive
-									? 'border-accent bg-accent/10 scale-[0.99]'
-									: 'hover:border-accent hover:bg-white/10'
-							)}
-						>
-							<input {...getInputProps()} />
-							<div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-border">
-								<ImagePlus
-									size={40}
-									className="text-secondary"
+				<div className="bg-surface border-2 border-border p-6 sm:p-8 paper-shadow min-h-[450px] relative z-0">
+					<div className="md:visible invisible absolute -top-5 -right-1 sm:right-4 bg-[#27272a] border-2 border-[#525252] px-4 py-1 shadow-lg z-20 flex items-center gap-3 rounded-sm">
+						<div className="w-1.5 h-1.5 rounded-full bg-[#737373] shadow-inner" />
+
+						<span className="font-mono text-[10px] font-bold text-gray-400 tracking-[0.2em] uppercase">
+							INPUT_ZONE
+						</span>
+
+						<div className="w-1.5 h-1.5 rounded-full bg-[#737373] shadow-inner" />
+					</div>
+
+					{!image ? (
+						mode === 'file' ? (
+							<div
+								{...getRootProps()}
+								className={clsx(
+									'w-full h-[350px] border-4 border-dashed border-border/40 rounded-lg flex flex-col items-center justify-center cursor-pointer transition-all bg-white/5',
+									isDragActive
+										? 'border-accent bg-accent/10 scale-[0.99]'
+										: 'hover:border-accent hover:bg-white/10'
+								)}
+							>
+								<input {...getInputProps()} />
+								<div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-border">
+									<ImagePlus
+										size={40}
+										className="text-secondary"
+									/>
+								</div>
+								<h3 className="font-mono text-2xl font-bold text-primary mb-2">Insert Sample Here</h3>
+								<p className="font-mono text-sm text-secondary">Drag & Drop or Click to Browse</p>
+								<p className="font-mono text-xs text-secondary/50 mt-2">Supports JPG, PNG (Max 5MB)</p>
+							</div>
+						) : (
+							<div className="w-full h-[350px] bg-black rounded-lg overflow-hidden relative border-4 border-border shadow-inner">
+								<Webcam
+									audio={false}
+									ref={webcamRef}
+									videoConstraints={videoConstraints}
+									screenshotFormat="image/jpeg"
+									className="w-full h-full object-cover opacity-90"
+								/>
+								<div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,0,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,0,0.1)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none" />
+								<button
+									onClick={capture}
+									className="absolute bottom-6 left-1/2 -translate-x-1/2 w-16 h-16 bg-red-600 rounded-full border-4 border-white/20 shadow-[0_0_20px_rgba(255,0,0,0.5)] active:scale-90 transition-transform hover:border-white"
 								/>
 							</div>
-							<h3 className="font-mono text-2xl font-bold text-primary mb-2">Insert Sample Here</h3>
-							<p className="font-mono text-sm text-secondary">Drag & Drop or Click to Browse</p>
-							<p className="font-mono text-xs text-secondary/50 mt-2">Supports JPG, PNG (Max 5MB)</p>
-						</div>
+						)
 					) : (
-						<div className="w-full h-[350px] bg-black rounded-lg overflow-hidden relative border-4 border-border shadow-inner">
-							<Webcam
-								audio={false}
-								ref={webcamRef}
-								videoConstraints={videoConstraints}
-								screenshotFormat="image/jpeg"
-								className="w-full h-full object-cover opacity-90"
-							/>
-							<div className="absolute inset-0 bg-[linear-gradient(rgba(0,255,0,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(0,255,0,0.1)_1px,transparent_1px)] bg-[size:50px_50px] pointer-events-none" />
-							<button
-								onClick={capture}
-								className="absolute bottom-6 left-1/2 -translate-x-1/2 w-16 h-16 bg-red-600 rounded-full border-4 border-white/20 shadow-[0_0_20px_rgba(255,0,0,0.5)] active:scale-90 transition-transform hover:border-white"
-							/>
-						</div>
-					)
-				) : (
-					<div className="flex flex-col items-center animate-in fade-in zoom-in-95 duration-500">
-						<div className="bg-white p-3 pb-12 shadow-xl transform rotate-1 transition-transform hover:rotate-0 duration-500 max-w-full relative inline-block">
-							<div className="md:visible invisible">
-								<div className="absolute -top-7 left-1/2 -translate-x-1/2 w-10 h-8 border-x-4 border-t-4 border-gray-400 rounded-t-md z-10" />
+						<div className="flex flex-col items-center animate-in fade-in zoom-in-95 duration-500">
+							<div className="bg-white p-3 pb-12 shadow-xl transform rotate-1 transition-transform hover:rotate-0 duration-500 max-w-full relative inline-block">
+								<div className="md:visible invisible">
+									<div className="absolute -top-7 left-1/2 -translate-x-1/2 w-10 h-8 border-x-4 border-t-4 border-gray-400 rounded-t-md z-10" />
 
-								<div className="absolute -top-2 left-1/2 -translate-x-1/2 w-16 h-6 bg-[#1a1a1a] rounded-sm shadow-lg z-20 flex items-center justify-center border-t border-gray-600">
-									<div className="w-full h-[1px] bg-white/20 mb-3" />
+									<div className="absolute -top-2 left-1/2 -translate-x-1/2 w-16 h-6 bg-[#1a1a1a] rounded-sm shadow-lg z-20 flex items-center justify-center border-t border-gray-600">
+										<div className="w-full h-[1px] bg-white/20 mb-3" />
+									</div>
+								</div>
+
+								<div className="relative w-full sm:min-w-[300px] max-w-[600px] bg-gray-100 border border-gray-300 overflow-hidden">
+									<Image
+										src={image}
+										alt="Original Specimen"
+										width={0}
+										height={0}
+										sizes="100vw"
+										className="w-full h-auto block"
+										unoptimized
+									/>
+
+									{result && activeView === 'detected' && detectedImage && (
+										<div className="absolute inset-0 z-10 bg-white">
+											<Image
+												src={detectedImage}
+												alt="YOLO Detection Result"
+												fill
+												className="object-contain"
+												unoptimized
+											/>
+										</div>
+									)}
+								</div>
+
+								<div className="absolute bottom-3 left-4 right-4 flex justify-between items-end">
+									<span className="font-mono italic text-gray-800 text-sm font-bold">
+										Specimen_ID: #2004
+									</span>
+									<span className="font-mono text-[10px] text-gray-500 uppercase tracking-widest">
+										{activeView} MODE
+									</span>
 								</div>
 							</div>
 
-							<div className="relative w-full sm:min-w-[300px] max-w-[600px] bg-gray-100 border border-gray-300 overflow-hidden">
-								<Image
-									src={image}
-									alt="Original Specimen"
-									width={0}
-									height={0}
-									sizes="100vw"
-									className="w-full h-auto block"
-									unoptimized
-								/>
+							<div className="mt-8 flex flex-col items-center gap-6 w-full">
+								{result && (
+									<div className="flex flex-wrap justify-center gap-2 sm:gap-4 p-2 bg-black/20 rounded-lg border border-border/50">
+										<button
+											onClick={() => setActiveView('original')}
+											className={clsx(
+												'flex items-center gap-2 px-4 py-2 rounded text-xs sm:text-sm font-bold font-mono transition-all border border-transparent cursor-pointer',
+												activeView === 'original'
+													? 'bg-primary text-black shadow-[2px_2px_0px_#000]'
+													: 'text-secondary hover:text-primary hover:border-border'
+											)}
+										>
+											<Eye size={14} /> ORIGINAL
+										</button>
 
-								{result && activeView === 'detected' && detectedImage && (
-									<div className="absolute inset-0 z-10 bg-white">
-										<Image
-											src={detectedImage}
-											alt="YOLO Detection Result"
-											fill
-											className="object-contain"
-											unoptimized
-										/>
+										<button
+											onClick={() => setActiveView('detected')}
+											className={clsx(
+												'flex items-center gap-2 px-4 py-2 rounded text-xs sm:text-sm font-bold font-mono transition-all border border-transparent cursor-pointer',
+												activeView === 'detected'
+													? 'bg-primary text-black shadow-[2px_2px_0px_#000]'
+													: 'text-secondary hover:text-primary hover:border-border'
+											)}
+										>
+											<Scan size={14} /> DETECTED
+										</button>
 									</div>
 								)}
-							</div>
 
-							<div className="absolute bottom-3 left-4 right-4 flex justify-between items-end">
-								<span className="font-mono italic text-gray-800 text-sm font-bold">
-									Specimen_ID: #2004
-								</span>
-								<span className="font-mono text-[10px] text-gray-500 uppercase tracking-widest">
-									{activeView} MODE
-								</span>
-							</div>
-						</div>
-
-						<div className="mt-8 flex flex-col items-center gap-6 w-full">
-							{result && (
-								<div className="flex flex-wrap justify-center gap-2 sm:gap-4 p-2 bg-black/20 rounded-lg border border-border/50">
+								<div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
 									<button
-										onClick={() => setActiveView('original')}
-										className={clsx(
-											'flex items-center gap-2 px-4 py-2 rounded text-xs sm:text-sm font-bold font-mono transition-all border border-transparent cursor-pointer',
-											activeView === 'original'
-												? 'bg-primary text-black shadow-[2px_2px_0px_#000]'
-												: 'text-secondary hover:text-primary hover:border-border'
-										)}
+										onClick={handleReset}
+										className="px-6 py-3 font-mono text-sm font-bold border-2 border-border text-secondary hover:text-primary hover:bg-white/5 transition-colors uppercase rounded-sm cursor-pointer"
 									>
-										<Eye size={14} /> ORIGINAL
+										{result ? 'New Scan' : 'Cancel'}
 									</button>
 
-									<button
-										onClick={() => setActiveView('detected')}
-										className={clsx(
-											'flex items-center gap-2 px-4 py-2 rounded text-xs sm:text-sm font-bold font-mono transition-all border border-transparent cursor-pointer',
-											activeView === 'detected'
-												? 'bg-primary text-black shadow-[2px_2px_0px_#000]'
-												: 'text-secondary hover:text-primary hover:border-border'
-										)}
-									>
-										<Scan size={14} /> DETECTED
-									</button>
+									{!result && (
+										<button
+											onClick={handleGenerate}
+											disabled={isProcessing}
+											className="px-8 py-3 bg-accent text-white text-center font-mono text-sm font-bold border-2 border-accent hover:bg-red-600 transition-colors uppercase flex items-center justify-center gap-2 shadow-[4px_4px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50 disabled:cursor-not-allowed rounded-sm cursor-pointer"
+										>
+											{isProcessing ? (
+												<RefreshCw
+													className="animate-spin"
+													size={16}
+												/>
+											) : (
+												<CheckCircle2 size={16} />
+											)}
+											{isProcessing ? 'Analyzing...' : 'Run YOLOv11'}
+										</button>
+									)}
 								</div>
-							)}
-
-							<div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-								<button
-									onClick={handleReset}
-									className="px-6 py-3 font-mono text-sm font-bold border-2 border-border text-secondary hover:text-primary hover:bg-white/5 transition-colors uppercase rounded-sm cursor-pointer"
-								>
-									{result ? 'New Scan' : 'Cancel'}
-								</button>
-
-								{!result && (
-									<button
-										onClick={handleGenerate}
-										disabled={isProcessing}
-										className="px-8 py-3 bg-accent text-white text-center font-mono text-sm font-bold border-2 border-accent hover:bg-red-600 transition-colors uppercase flex items-center justify-center gap-2 shadow-[4px_4px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] disabled:opacity-50 disabled:cursor-not-allowed rounded-sm cursor-pointer"
-									>
-										{isProcessing ? (
-											<RefreshCw
-												className="animate-spin"
-												size={16}
-											/>
-										) : (
-											<CheckCircle2 size={16} />
-										)}
-										{isProcessing ? 'Analyzing...' : 'Run YOLOv11'}
-									</button>
-								)}
 							</div>
 						</div>
-					</div>
-				)}
+					)}
+				</div>
 			</div>
+
+			{result && detectionDetails.length > 0 && (
+				<div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+					<DetectionResults details={detectionDetails} />
+				</div>
+			)}
 
 			<AnimatePresence>
 				{notification && (
