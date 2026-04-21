@@ -19,15 +19,17 @@ export default function DetectionResults({ details }: DetectionResultsProps) {
 				acc[name] = {
 					name: name,
 					count: 1,
-					maxConfidence: curr.confidence
+					maxConfidence: curr.confidence,
+					minConfidence: curr.confidence
 				};
 			} else {
 				acc[name].count += 1;
 				acc[name].maxConfidence = Math.max(acc[name].maxConfidence, curr.confidence);
+				acc[name].minConfidence = Math.min(acc[name].minConfidence, curr.confidence);
 			}
 			return acc;
 		},
-		{} as Record<string, { name: string; count: number; maxConfidence: number }>
+		{} as Record<string, { name: string; count: number; maxConfidence: number; minConfidence: number }>
 	);
 
 	const summaryList = Object.values(groupedDetails);
@@ -80,20 +82,23 @@ export default function DetectionResults({ details }: DetectionResultsProps) {
 								</div>
 							</div>
 
-							<div className="flex items-center bg-surface border-2 border-border px-4 py-2 shadow-inner">
-								<div className="flex flex-col items-end">
-									<span className="font-mono text-[10px] font-bold text-secondary uppercase tracking-wider mb-0.5">
-										AI_ACCURACY
-									</span>
-									<span
-										className={clsx(
-											'font-sans font-black text-2xl tracking-tighter leading-none',
-											item.maxConfidence >= 85 ? 'text-leaf' : 'text-[#eab308]'
-										)}
-									>
-										{item.maxConfidence.toFixed(1)}%
-									</span>
-								</div>
+							<div className="flex flex-col items-center bg-surface border-2 border-border px-4 py-2 shadow-inner">
+								<span className="font-mono text-[10px] font-bold text-secondary uppercase tracking-wider mb-0.5">
+									AI_ACCURACY
+								</span>
+								<span
+									className={clsx(
+										'font-sans font-black tracking-tighter leading-none',
+										Math.round(item.minConfidence) === Math.round(item.maxConfidence)
+											? 'text-2xl'
+											: 'text-xl',
+										item.maxConfidence >= 85 ? 'text-leaf' : 'text-[#eab308]'
+									)}
+								>
+									{Math.round(item.minConfidence) === Math.round(item.maxConfidence)
+										? `${Math.round(item.maxConfidence)}%`
+										: `${Math.round(item.minConfidence)}% - ${Math.round(item.maxConfidence)}%`}
+								</span>
 							</div>
 						</div>
 					);

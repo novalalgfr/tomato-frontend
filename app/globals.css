@@ -1,37 +1,16 @@
 @import 'tailwindcss';
 
 @theme {
-	/* --- DARK MODE PALETTE --- */
-
-	/* Background: Hitam Arang (Chalkboard base) */
 	--color-background: #0a0a0a;
-
-	/* Surface: Kertas Karton Hitam / Abu Gelap */
 	--color-surface: #171717;
-
-	/* Border: Abu-abu medium (Garis tegas) */
 	--color-border: #404040;
-
-	/* Text: Putih Gading (Chalk White) */
 	--color-primary: #ededed;
-
-	/* Text Secondary: Abu-abu terang */
 	--color-secondary: #a1a1aa;
-
-	/* Accent: Merah Tomat Neon (Biar menyala di background hitam) */
 	--color-accent: #ef4444;
-
-	/* Leaf: Hijau Neon */
 	--color-leaf: #4ade80;
-
-	/* Tape: Selotip Abu Gelap Metalik */
 	--color-tape: #27272a;
-
-	/* Fonts (Tetap sama) */
 	--font-family-serif: var(--font-playfair), 'Times New Roman', serif;
 	--font-family-mono: 'Courier New', Courier, monospace;
-
-	/* Animations */
 	--animate-float: float 6s ease-in-out infinite;
 	@keyframes float {
 		0%,
@@ -44,18 +23,15 @@
 	}
 }
 
-/* --- Utilities Custom --- */
-
 @utility tape-effect {
 	background-color: var(--color-tape);
 	opacity: 0.9;
 	border: 1px solid #525252;
-	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* Shadow lebih tebal */
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
 	transform: rotate(-2deg);
 }
 
 @utility paper-shadow {
-	/* Shadow hitam pekat (Hard Shadow) agar timbul di background gelap */
 	box-shadow: 8px 8px 0px #000000;
 	border: 1px solid var(--color-border);
 }
@@ -64,7 +40,6 @@
 	border-bottom: 2px dashed var(--color-border);
 }
 
-/* SETTING ROOT KE DARK */
 :root {
 	color-scheme: dark;
 }
@@ -73,16 +48,13 @@ body {
 	background-color: var(--color-background);
 	color: var(--color-primary);
 	font-family: var(--font-family-serif);
-
-	/* GRID PATTERN: UBAH JADI PUTIH TRANSPARAN */
-	/* Ini yang membuat efek buku tulis hitam */
-	background-image: linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+	background-image:
+		linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
 		linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
 	background-size: 40px 40px;
 	background-position: -1px -1px;
 }
 
-/* VIGNETTE DARK: Agar pinggiran layar lebih gelap fokus ke tengah */
 body::before {
 	content: '';
 	position: fixed;

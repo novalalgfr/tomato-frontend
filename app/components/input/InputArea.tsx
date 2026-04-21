@@ -41,6 +41,7 @@ export default function InputArea() {
 
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [result, setResult] = useState<boolean>(false);
+	const [resultType, setResultType] = useState<string | null>(null);
 	const [activeView, setActiveView] = useState<ViewMode>('original');
 	const [notification, setNotification] = useState<string | null>(null);
 
@@ -52,7 +53,7 @@ export default function InputArea() {
 
 	const showNotification = (message: string) => {
 		setNotification(message);
-		setTimeout(() => setNotification(null), 4000);
+		setTimeout(() => setNotification(null), 8000);
 	};
 
 	const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -62,6 +63,7 @@ export default function InputArea() {
 			setFileToUpload(file);
 			setNotification(null);
 			setResult(false);
+			setResultType(null);
 			setActiveView('original');
 			setDetectedImage(null);
 			setDetectionDetails([]);
@@ -96,6 +98,7 @@ export default function InputArea() {
 			setFileToUpload(file);
 			setNotification(null);
 			setResult(false);
+			setResultType(null);
 			setDetectedImage(null);
 			setDetectionDetails([]);
 			setActiveView('original');
@@ -107,9 +110,11 @@ export default function InputArea() {
 			showNotification('Error: Please insert leaf sample first!');
 			return;
 		}
+
 		setIsProcessing(true);
 		setActiveView('original');
 		setResult(false);
+		setResultType(null);
 		setDetectionDetails([]);
 
 		const formData = new FormData();
@@ -125,15 +130,22 @@ export default function InputArea() {
 			const data = await response.json();
 
 			if (response.ok && data.status === 'success') {
+				const type: string = data.result_type;
+				setResultType(type);
+
+				if (type === 'no_detection') {
+					showNotification('No tomato leaf disease detected');
+					return;
+				}
+
+				// disease_detected
 				setDetectedImage(data.detect_url);
 				setResult(true);
 				setActiveView('detected');
+				setDetectionDetails(data.details || []);
 
-				const details = data.details || [];
-				setDetectionDetails(details);
-
-				console.log('=== HASIL DIAGNOSIS TOMATO.LOGY ===');
-				console.log(details);
+				console.log('=== DIAGNOSIS RESULTS: TOMATO.LOGY ===');
+				console.log(data.details);
 			} else {
 				showNotification(data.error || 'Failed to process image.');
 			}
@@ -149,6 +161,7 @@ export default function InputArea() {
 		setImage(null);
 		setFileToUpload(null);
 		setResult(false);
+		setResultType(null);
 		setDetectedImage(null);
 		setDetectionDetails([]);
 		setActiveView('original');
@@ -196,11 +209,9 @@ export default function InputArea() {
 				<div className="bg-surface border-2 border-border p-6 sm:p-8 paper-shadow min-h-[450px] relative z-0">
 					<div className="md:visible invisible absolute -top-5 -right-1 sm:right-4 bg-[#27272a] border-2 border-[#525252] px-4 py-1 shadow-lg z-20 flex items-center gap-3 rounded-sm">
 						<div className="w-1.5 h-1.5 rounded-full bg-[#737373] shadow-inner" />
-
 						<span className="font-mono text-[10px] font-bold text-gray-400 tracking-[0.2em] uppercase">
 							INPUT_ZONE
 						</span>
-
 						<div className="w-1.5 h-1.5 rounded-full bg-[#737373] shadow-inner" />
 					</div>
 
@@ -247,7 +258,6 @@ export default function InputArea() {
 							<div className="bg-white p-3 pb-12 shadow-xl transform rotate-1 transition-transform hover:rotate-0 duration-500 max-w-full relative inline-block">
 								<div className="md:visible invisible">
 									<div className="absolute -top-7 left-1/2 -translate-x-1/2 w-10 h-8 border-x-4 border-t-4 border-gray-400 rounded-t-md z-10" />
-
 									<div className="absolute -top-2 left-1/2 -translate-x-1/2 w-16 h-6 bg-[#1a1a1a] rounded-sm shadow-lg z-20 flex items-center justify-center border-t border-gray-600">
 										<div className="w-full h-[1px] bg-white/20 mb-3" />
 									</div>
@@ -348,7 +358,7 @@ export default function InputArea() {
 				</div>
 			</div>
 
-			{result && detectionDetails.length > 0 && (
+			{result && resultType === 'disease_detected' && detectionDetails.length > 0 && (
 				<div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
 					<DetectionResults details={detectionDetails} />
 				</div>
