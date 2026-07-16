@@ -18,8 +18,8 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
 	title: {
-		template: '%s | TomatoDoctor',
-		default: 'TomatoDoctor - YOLOv11 AI Diagnostic'
+		template: '%s | TomatoLogy',
+		default: 'TomatoLogy - YOLOv11 AI Diagnostic'
 	},
 	description: 'Sistem deteksi penyakit daun tomat berbasis Artificial Intelligence (YOLOv11).',
 	keywords: ['YOLOv11', 'Computer Vision', 'Tomato Disease', 'Skripsi', 'AI'],
